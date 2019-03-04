@@ -1,6 +1,6 @@
 ### ----------------------- IOT ANALYTICS -------------------------- ###
 ### -------- Domain Research and Exploratory Data Analysis --------- ###
-### --------------------- by Alican Tanaçan ------------------------ ###
+### --------------------- by Alican TanaÃ§an ------------------------ ###
 ### ------ Version 3: Feature Engineering and Data Cleaning -------- ###
 
 ## Libraries ----
@@ -35,7 +35,7 @@ yr_2009 <- dbGetQuery(con, "SELECT Date, Time, Global_active_power,
 yr_2010 <- dbGetQuery(con, "SELECT Date, Time, Global_active_power,
                       Sub_metering_1, Sub_metering_2, Sub_metering_3 FROM yr_2010")
 
-# Combine tables into one dataframe using dplyr
+# Combine tables into one data frame using dplyr
 EnergyConsumptionFullData <- bind_rows(yr_2006, yr_2007, yr_2008, yr_2009, yr_2010)
 summary(EnergyConsumptionFullData)
 
@@ -72,7 +72,6 @@ str(EnergyConsumption)
 EnergyConsumption$Year <- year(EnergyConsumption$DateTime)
 EnergyConsumption$Month <- month(EnergyConsumption$DateTime)
 EnergyConsumption$MonthName <- month(EnergyConsumption$DateTime, label = T)
-EnergyConsumption$Day <- day(EnergyConsumption$DateTime)
 
 # Inspect the data types
 str(EnergyConsumption)
@@ -84,11 +83,13 @@ EnergyConsumption <- EnergyConsumption %>% rename(GAP = Global_active_power,
                                                   SM2 = Sub_metering_2,
                                                   SM3 = Sub_metering_3)
 
-# Remove "DateTime" column
-EnergyConsumption$DateTime <- NULL
-
-# Define active power in kWh
-EnergyConsumption$ActivePower <- (EnergyConsumption$GAP * 1000/60)
+# Define active power, which represents the active energy consumed every minute 
+# (in watt hour) in the household by electrical equipment not measured in 
+# sub-meterings 1, 2 and 3
+EnergyConsumption$ActivePower <- ((EnergyConsumption$GAP * 1000/60) - 
+                                    EnergyConsumption$SM1 - 
+                                    EnergyConsumption$SM2 - 
+                                    EnergyConsumption$SM3)
 
 # Create another variable that shows year and month in one column
 EnergyConsumption$Date <- as.yearmon(paste(EnergyConsumption$Year, 
@@ -137,14 +138,31 @@ EnergyConsumption <-
                                       "Fall"))))
 
 # Change data types
-EnergyConsumption <- 
-  EnergyConsumption %>% 
-  mutate_at(c("Seasons", 
-              "SeasonName"), 
-            as.factor)
+str(EnergyConsumption)
+
+EnergyConsumption$SeasonName <- as.factor(EnergyConsumption$SeasonName)
+            
+EnergyConsumption$Seasons <- factor(EnergyConsumption$Seasons, levels =c("Winter 2007",
+                                       "Spring 2007",
+                                       "Summer 2007",
+                                       "Fall 2007",
+                                       "Winter 2008",
+                                       "Spring 2008",
+                                       "Summer 2008",
+                                       "Fall 2008",
+                                       "Winter 2009",
+                                       "Spring 2009",
+                                       "Summer 2009",
+                                       "Fall 2009",
+                                       "Winter 2010",
+                                       "Spring 2010",
+                                       "Summer 2010",
+                                       "Fall 2010"), ordered = T)
+levels(EnergyConsumption$Seasons)
+head(EnergyConsumption$Seasons)
 
 # Define ready data
-EnergyConsumptionReady <- subset(EnergyConsumption, select = -c(5:7))
+EnergyConsumptionReady <- subset(EnergyConsumption, select = -c(Year:MonthName))
 
 # To save the clean data as rds
 saveRDS(EnergyConsumptionReady, file = "EnergyCleanData.rds")
