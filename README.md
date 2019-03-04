@@ -3,6 +3,9 @@ R Programming / Domain Research and Exploratory Data Analysis
 
 In this task we are asked to analyze the Individual household electric power consumption data set.
 
+Data Frame:
+Measurements of electric power consumption in one household with a one-minute sampling rate over a period of almost 4 years. Different electrical quantities and some sub-metering values are available.
+
 Attribute Information:
 1.date: Date in format dd/mm/yyyy 
 2.time: time in format hh:mm:ss 
