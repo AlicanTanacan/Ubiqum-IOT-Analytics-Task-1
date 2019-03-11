@@ -24,3 +24,6 @@ Version 1 is about obtaining the data by sql query and date/time treatment
 Version 2 is about exploring the original data that can be acquired from UCI Machine Learning Rep.
 Version 3 is about preparing a clean data for visualization
 Version 4 is about data visualization and exploratory data analyses
+
+Tutorials:
+Tutorials are about learning dplyr. Please see the link.
